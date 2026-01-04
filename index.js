@@ -1,17 +1,34 @@
 const express = require('express');
 const app = express();
+const mysql = require('mysql2');
+
+const pool = mysql.createPool({
+  host: "localhost",
+  user: "root",
+  password: "root",
+  database: "estore",
+  port: 3306,
+  multipleStatements: true
+})
 
 app.get("/",(req,res)=>{
-  let prodData = {
-    pName: "Jackets",
-    price: 45,
-    img: "shop-1.jpg",
-  }
-  res.status(200).send(prodData);
+  let categorydata;
+
+  {
+      pool.query("Select * from categories", (error,categories)=>{
+        if(error){
+          categorydata = error;
+          res.status(500).send(categorydata);
+        }else{
+          categorydata = categories;
+          res.status(200).send(categorydata);
+        }
+      })
+    }
 })
 
 const PORT = 5001;
 
 const server = app.listen(PORT, ()=>{
-  console.log("yay yayyyy on 5001 port")
+  console.log("yayyy 5001 port running")
 })
